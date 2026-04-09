@@ -12,7 +12,7 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/bggRGjQaUbCoE/PiliPlus) 
 ![GitHub all releases](https://img.shields.io/github/downloads/bggRGjQaUbCoE/PiliPlus/total) 
 </div>
-    <p>使用AI辅助基于[PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus) 构建的BiliBili第三方TV客户端</p>
+    <p>使用AI辅助基于 [PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus) 构建的BiliBili第三方TV客户端</p>
     
 <img src="assets/screenshots/510shots_so.png" width="32%" alt="home" />
 <img src="assets/screenshots/174shots_so.png" width="32%" alt="home" />

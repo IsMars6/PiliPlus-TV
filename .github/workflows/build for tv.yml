@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       build_android:
-        description: "Build Android"
+        description: "Build Android TV"
         required: false
         default: true
         type: boolean

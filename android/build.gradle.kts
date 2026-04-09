@@ -1,9 +1,3 @@
-// 👇 必须加这一段，适配 Flutter 3.41 + Gradle 8.14
-plugins {
-    id("com.android.application") version "8.5.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.20" apply false
-}
-
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {

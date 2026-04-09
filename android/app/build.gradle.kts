@@ -1,16 +1,10 @@
-import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import org.jetbrains.kotlin.konan.properties.Properties
-
-plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("dev.flutter.flutter-gradle-plugin")
-}
-
 android {
     namespace = "com.example.piliplus"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+
+    // 必加：声明 flavor 维度
+    flavorDimensions += "device"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -31,63 +25,16 @@ android {
         versionName = flutter.versionName
     }
 
-    packagingOptions.jniLibs.useLegacyPackaging = true
+    // ... 中间其他不变 ...
 
-    val keyProperties = Properties().also {
-        val properties = rootProject.file("key.properties")
-        if (properties.exists())
-            it.load(properties.inputStream())
-    }
-
-    val config = keyProperties.getProperty("storeFile")?.let {
-        signingConfigs.create("release") {
-            storeFile = file(it)
-            storePassword = keyProperties.getProperty("storePassword")
-            keyAlias = keyProperties.getProperty("keyAlias")
-            keyPassword = keyProperties.getProperty("keyPassword")
-            enableV1Signing = true
-            enableV2Signing = true
-        }
-    }
-
-    buildTypes {
-        all {
-            signingConfig = config ?: signingConfigs["debug"]
-        }
-        release {
-            if (project.hasProperty("dev")) {
-                applicationIdSuffix = ".dev"
-                resValue(
-                    type = "string",
-                    name = "app_name",
-                    value = "PiliPlus dev",
-                )
-            }
-        }
-        debug {
-            applicationIdSuffix = ".debug"
-        }
-    }
-
-    // TV product flavor
     productFlavors {
         create("tv") {
-            dimension = "device"
+            dimension = "device"  // 这里已经写对了
             applicationIdSuffix = ".tv"
- 
-           versionNameSuffix = "-tv"
+            versionNameSuffix = "-tv"
             resValue("string", "app_name", "PiliPlus TV")
         }
     }
 
-    applicationVariants.all {
-        val variant = this
-        variant.outputs.forEach { output ->
-            (output as ApkVariantOutputImpl).versionCodeOverride = flutter.versionCode
-        }
-    }
-}
-
-flutter {
-    source = "../.."
+    // ...
 }

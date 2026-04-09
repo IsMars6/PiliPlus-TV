@@ -45,11 +45,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # 自定义版本号
       - name: Set build version
         run: echo "version=TV-$(date +%Y%m%d-%H%M)" >> $GITHUB_ENV
 
-      # 构建 APK（按 ABI 拆分）
       - name: Build Android TV APK
         run: |
           flutter build apk \
@@ -57,11 +55,9 @@ jobs:
             --split-per-abi \
             --target-platform android-arm,android-arm64,android-x64
 
-      # 查看生成的文件（调试用）
       - name: List generated apks
         run: ls -la build/app/outputs/flutter-apk/
 
-      # 重命名成你要的 PiliPlus_TV_xxx 格式
       - name: Rename APKs
         run: |
           cd build/app/outputs/flutter-apk
@@ -70,7 +66,6 @@ jobs:
             mv "$apk" "../../../PiliPlus_TV_${{ env.version }}_${abi}.apk"
           done
 
-      # 上传三个架构
       - name: Upload arm64-v8a
         uses: actions/upload-artifact@v7
         with:
@@ -89,10 +84,9 @@ jobs:
           name: PiliPlus_TV_x86_64
           path: PiliPlus_TV_*_x86_64.apk
 
-      # 填 tag 就自动发 Release
       - name: Create GitHub Release
         if: ${{ github.event.inputs.tag != '' }}
-        uses: softprops/gh-release@v2
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag }}
           files: PiliPlus_TV_*.apk

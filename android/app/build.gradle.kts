@@ -3,30 +3,33 @@ import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.piliplus"
-    compileSdk = 34
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    // 👇 关键修复：必须声明 flavor 维度
+    flavorDimensions += "device"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
-
-    // 👇 必须加这个 flavor 维度
-    flavorDimensions += "device"
 
     defaultConfig {
         applicationId = "com.example.piliplus"
-        minSdk = 21
-        targetSdk = 34
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -55,11 +58,13 @@ android {
             signingConfig = config ?: signingConfigs["debug"]
         }
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
             if (project.hasProperty("dev")) {
                 applicationIdSuffix = ".dev"
-                resValue("string", "app_name", "PiliPlus dev")
+                resValue(
+                    type = "string",
+                    name = "app_name",
+                    value = "PiliPlus dev",
+                )
             }
         }
         debug {
@@ -67,6 +72,7 @@ android {
         }
     }
 
+    // TV product flavor
     productFlavors {
         create("tv") {
             dimension = "device"
@@ -77,7 +83,8 @@ android {
     }
 
     applicationVariants.all {
-        outputs.forEach { output ->
+        val variant = this
+        variant.outputs.forEach { output ->
             (output as ApkVariantOutputImpl).versionCodeOverride = flutter.versionCode
         }
     }

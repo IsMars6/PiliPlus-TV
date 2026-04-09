@@ -73,8 +73,8 @@ jobs:
 
       - name: Rename
         run: |
-          for file in build/app/outputs/flutter-apk/app-tv-*-release.apk; do
-            abi=$(echo "$file" | sed -E 's|.*app-tv-(.*)-release\.apk|\1|')
+          for file in build/app/outputs/flutter-apk/app-tv-release-*.apk; do
+            abi=$(echo "$file" | sed -E 's|.*app-tv-release-(.*)\.apk|\1|')
             mv "$file" "PiliPlus_TV_${{ env.version }}_${abi}.apk"
           done
         shell: bash

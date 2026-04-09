@@ -1,1 +1,29 @@
+name: Build For TV
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build-tv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.6'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build TV APK
+        run: flutter build apk --release --flavor tv
+
+      - name: Upload TV APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: piliplus-tv-apk
+          path: build/app/outputs/flutter-apk/app-tv-release.apk
+          retention-days: 30

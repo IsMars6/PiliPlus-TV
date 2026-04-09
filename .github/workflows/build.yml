@@ -17,7 +17,7 @@ on:
         default: true
         type: boolean
       tag:
-        description: "版本号(例如v1.0，填写将创建Release)"
+        description: "版本号(例如v1.0,填写将创建Release)"
         required: false
         default: ""
         type: string
@@ -62,12 +62,10 @@ jobs:
         run: |
           if [ -n "${{ secrets.SIGN_KEYSTORE_BASE64 }}" ]; then
             echo "${{ secrets.SIGN_KEYSTORE_BASE64 }}" | base64 --decode > android/app/key.jks
-            cat > android/key.properties <<EOF
-storeFile=key.jks
-storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-keyAlias=${{ secrets.KEY_ALIAS }}
-keyPassword=${{ secrets.KEY_PASSWORD }}
-EOF
+            echo "storeFile=key.jks" > android/key.properties
+            echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+            echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+            echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
           fi
 
       - name: Set version
@@ -79,7 +77,7 @@ EOF
         if: github.event_name == 'workflow_dispatch'
         run: flutter build apk --release --flavor tv --split-per-abi --dart-define-from-file=pili_release.json --pub
 
-      - name: Build TV Dev (PR)
+      - name: Build TV Dev
         if: github.event_name == 'pull_request'
         run: flutter build apk --release --flavor tv --split-per-abi --android-project-arg dev=1 --pub
 
@@ -102,22 +100,22 @@ EOF
         with:
           tag_name: ${{ inputs.tag }}
           name: "TV ${{ inputs.tag }}"
-          files: PiliPlus_TV_*.apk
+          files: ${{ github.workspace }}/PiliPlus_TV_*.apk
 
       - name: Upload arm64-v8a
         uses: actions/upload-artifact@v7
         with:
           name: TV_arm64-v8a
-          path: PiliPlus_TV_*_arm64-v8a.apk
+          path: ${{ github.workspace }}/PiliPlus_TV_*_arm64-v8a.apk
 
       - name: Upload armeabi-v7a
         uses: actions/upload-artifact@v7
         with:
           name: TV_armeabi-v7a
-          path: PiliPlus_TV_*_armeabi-v7a.apk
+          path: ${{ github.workspace }}/PiliPlus_TV_*_armeabi-v7a.apk
 
       - name: Upload x86_64
         uses: actions/upload-artifact@v7
         with:
           name: TV_x86_64
-          path: PiliPlus_TV_*_x86_64.apk
+          path: ${{ github.workspace }}/PiliPlus_TV_*_x86_64.apk

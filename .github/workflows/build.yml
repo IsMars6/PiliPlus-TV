@@ -36,6 +36,10 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Set version
+        if: github.event.inputs.tag != ''
+        run: echo "version=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+
       - run: flutter build apk --release
         if: github.event_name == 'workflow_dispatch'
 
@@ -44,5 +48,5 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: PiliPlus_TV_APK
+          name: PiliPlus_TV_${{ env.version || 'dev' }}.apk
           path: build/app/outputs/flutter-apk/app-*.apk

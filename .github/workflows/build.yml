@@ -36,23 +36,18 @@ jobs:
         run: |
           flutter create --org com.example --project-name piliplus .
 
-      - name: Modify app label
+      - name: Modify package name, app label and version
         run: |
+          # 修改包名
+          sed -i 's/com.example.piliplus/com.example.piliplus.tv/g' android/app/src/main/AndroidManifest.xml
+          sed -i 's/com.example.piliplus/com.example.piliplus.tv/g' android/app/build.gradle.kts
+          # 修改应用名称
           sed -i 's/android:label="piliplus"/android:label="PiliPlus TV"/g' android/app/src/main/AndroidManifest.xml
-
-      - run: flutter pub get
-
-      - name: Set version
-        if: github.event.inputs.tag != ''
-        run: echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-
-      - run: flutter build apk --release
-        if: github.event_name == 'workflow_dispatch'
-
-      - run: flutter build apk --release --dart-define=dev=1
-        if: github.event_name == 'pull_request'
+          # 版本通过 dart-define 传递
+          VERSION=${{ github.event.inputs.tag || 'dev' }}
+          flutter build apk --release --dart-define=VERSION=$VERSION
 
       - uses: actions/upload-artifact@v7
         with:
-          name: PiliPlus_TV_${{ env.VERSION || 'dev' }}
+          name: PiliPlus_TV_${{ github.event.inputs.tag || 'dev' }}.apk
           path: build/app/outputs/flutter-apk/app-*.apk

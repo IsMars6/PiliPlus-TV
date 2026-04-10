@@ -40,16 +40,24 @@ jobs:
         with:
           channel: stable
 
+      - name: Apply Patch
+        run: pwsh lib/scripts/patch.ps1 android
+        continue-on-error: true
+
       - name: Flutter pub get
         run: flutter pub get
 
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --no-tree-shake-icons --no-pub
+        run: |
+          flutter build apk --release --no-tree-shake-icons --no-pub
+          find . -name "*.apk"
 
       - name: Build Dev APK
         if: github.event_name == 'pull_request'
-        run: flutter build apk --release --no-tree-shake-icons --no-pub --dart-define=dev=1
+        run: |
+          flutter build apk --release --no-tree-shake-icons --no-pub --dart-define=dev=1
+          find . -name "*.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v7

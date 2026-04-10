@@ -50,18 +50,13 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Clean
-        run: |
-          rm -rf build/ android/app/build/ android/build/
-          find android -name "GeneratedPluginRegistrant.java" -delete
-
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --split-per-abi --no-tree-shake-icons
+        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --pub
 
       - name: Build Dev APK
         if: github.event_name == 'pull_request'
-        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --dart-define=dev=1
+        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --pub --dart-define=dev=1
 
       - name: Upload APK
         uses: actions/upload-artifact@v7

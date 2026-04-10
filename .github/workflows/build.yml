@@ -51,6 +51,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Delete plugin registrant again
+        run: find android -name "GeneratedPluginRegistrant.java" -delete
+
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
         run: flutter build apk --release --no-tree-shake-icons --no-pub

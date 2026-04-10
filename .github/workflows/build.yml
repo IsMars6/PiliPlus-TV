@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release Tag"
+        description: "Release Tag (如 v1.0.0)"
         required: false
         default: ""
 
@@ -32,13 +32,17 @@ jobs:
         with:
           channel: stable
 
-      - run: flutter create --org com.example --project-name piliplus .
+      - name: Create Android project
+        run: |
+          flutter create --org com.example --project-name piliplus .
+          # 修改 app 名称为 PiliPlus TV
+          sed -i 's/app_name: PiliPlus/app_name: PiliPlus TV/' android/app/src/main/res/values/strings.xml 2>/dev/null || true
 
       - run: flutter pub get
 
       - name: Set version
         if: github.event.inputs.tag != ''
-        run: echo "version=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        run: echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
 
       - run: flutter build apk --release
         if: github.event_name == 'workflow_dispatch'
@@ -48,5 +52,5 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: PiliPlus_TV_${{ env.version || 'dev' }}.apk
+          name: PiliPlus_TV_${{ env.VERSION || 'dev' }}
           path: build/app/outputs/flutter-apk/app-*.apk

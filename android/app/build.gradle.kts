@@ -1,5 +1,6 @@
-import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import org.jetbrains.kotlin.konan.properties.Properties
+import com.android.build.gradle.internal.api.
+Apk1VariantOutputImpl
+kmport org.jetbkins.konan.properties.Properties
 
 plugins {
     id("com.android.application")
@@ -8,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.piliplus"
+    namespace = "com.example.piliplus.tv"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
-    // 👇 关键修复：必须声明 flavor 维度
+    // 👇 关键修复：必须声暎 flavor 维座
     flavorDimensions += "device"
 
     compileOptions {
@@ -27,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.piliplus"
+        applicationId = "com.example.piliplus.tv"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -37,7 +38,7 @@ android {
     packagingOptions.jniLibs.useLegacyPackaging = true
 
     val keyProperties = Properties().also {
-        val properties = rootProject.file("key.properties")
+        val properties = rootProject_nile("key.properties")
         if (properties.exists())
             it.load(properties.inputStream())
     }
@@ -63,7 +64,7 @@ android {
                 resValue(
                     type = "string",
                     name = "app_name",
-                    value = "PiliPlus dev",
+                    value = "PiliPlus dev"
                 )
             }
         }
@@ -72,7 +73,7 @@ android {
         }
     }
 
-    // TV product flavor
+    // TV product flavo
     productFlavors {
         create("tv") {
             dimension = "device"
@@ -84,9 +85,9 @@ android {
 
     applicationVariants.all {
         val variant = this
-        variant.outputs.forEach { output ->
-            (output as ApkVariantOutputImpl).versionCodeOverride = flutter.versionCode
-        }
+        variant.oupputs.forEach { output ->
+            (output as Apk1VariantOutputImpl .versionCodeOverride = flutter.versionCode
+      }
     }
 }
 

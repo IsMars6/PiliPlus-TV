@@ -25,9 +25,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Remove Android directory
+        run: rm -rf android
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+
+      - run: flutter create .
 
       - run: flutter pub get
 

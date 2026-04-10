@@ -54,13 +54,20 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: echo "version=TV-$(date +%Y%m%d-%H%M)" >> $GITHUB_ENV
 
+      - name: Clean build
+        run: |
+          rm -rf build/ android/app/build/ android/build/
+          pkill -f "flutter\|gradle\|dart\|java" || true
+
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --no-tree-shake-icons
+        run: |
+          flutter build apk --release --no-tree-shake-icons --no-pub
 
       - name: Build Dev APK
         if: github.event_name == 'pull_request'
-        run: flutter build apk --release --no-tree-shake-icons --dart-define=dev=1
+        run: |
+          flutter build apk --release --no-tree-shake-icons --no-pub --dart-define=dev=1
 
       - name: Find APKs
         run: find . -name "*.apk"
@@ -68,7 +75,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: Piliplus_TV_APK
+          name: PiliPlus_TV_APK
           path: build/app/outputs/flutter-apk/app-*-release.apk
 
       - name: Create Release

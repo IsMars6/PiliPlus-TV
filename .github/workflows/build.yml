@@ -34,14 +34,12 @@ jobs:
         with:
           distribution: "zulu"
           java-version: "17"
-          cache: "gradle"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
-          cache: true
 
       - name: Apply Patch
         run: pwsh lib/scripts/patch.ps1 android
@@ -52,11 +50,15 @@ jobs:
 
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --pub
+        run: |
+          rm -rf ~/.pub-cache/hosted/pub.dev/*/
+          flutter build apk --release --no-tree-shake-icons --pub
 
       - name: Build Dev APK
         if: github.event_name == 'pull_request'
-        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --pub --dart-define=dev=1
+        run: |
+          rm -rf ~/.pub-cache/hosted/pub.dev/*/
+          flutter build apk --release --no-tree-shake-icons --pub --dart-define=dev=1
 
       - name: Upload APK
         uses: actions/upload-artifact@v7

@@ -35,8 +35,7 @@ jobs:
       - name: Create Android project
         run: |
           flutter create --org com.example --project-name piliplus .
-          # 修改 app 名称为 PiliPlus TV
-          sed -i 's/<string name="app_name">[^<]*<\/string>/<string name="app_name">PiliPlus TV<\/string>/' android/app/src/main/res/values/strings.xml
+          sed -i 's/"PiliPlus"/"PiliPlus TV"/g' android/app/build.gradle.kts
 
       - run: flutter pub get
 

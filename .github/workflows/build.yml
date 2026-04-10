@@ -18,7 +18,7 @@ on:
 
 jobs:
   android_tv:
-    if: ${{ github.event_name == '"'"'pull_request'"'"' || github.event_name == '"'"'workflow_dispatch'"'"' }}
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
     name: Build Android TV
     runs-on: ubuntu-latest
     permissions: write-all
@@ -56,11 +56,11 @@ jobs:
         run: flutter pub get
 
       - name: Build Release APK
-        if: github.event_name == '"'"'workflow_dispatch'"'"'
+        if: github.event_name == 'workflow_dispatch'
         run: flutter build apk --release --split-per-abi --no-tree-shake-icons
 
       - name: Build Dev APK
-        if: github.event_name == '"'"'pull_request'"'"'
+        if: github.event_name == 'pull_request'
         run: flutter build apk --release --split-per-abi --no-tree-shake-icons --dart-define=dev=1
 
       - name: Upload

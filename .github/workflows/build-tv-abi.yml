@@ -27,13 +27,22 @@ jobs:
         run: |
           flutter create --org com.example --project-name piliplus .
 
-      - name: Modify package name and app label
+      - name: Modify package name, app label and version
         run: |
           # 修改包名
           sed -i 's/com.example.piliplus/com.example.piliplus.tv/g' android/app/src/main/AndroidManifest.xml
           sed -i 's/com.example.piliplus/com.example.piliplus.tv/g' android/app/build.gradle.kts
           # 修改应用名称
           sed -i 's/android:label="piliplus"/android:label="PiliPlus TV"/g' android/app/src/main/AndroidManifest.xml
+          # 修改版本号
+          VERSION=${{ github.event.inputs.tag || 'dev' }}
+          # 提取版本名 (去掉 v 前缀)
+          VERSION_NAME=${VERSION#v}
+          # 生成 versionCode (时间戳)
+          VERSION_CODE=$(date +%s)
+          # 修改 versionCode 和 versionName
+          sed -i "s/versionCode 1/versionCode $VERSION_CODE/" android/app/build.gradle.kts
+          sed -i "s/versionName \"1.0.0\"/versionName \"$VERSION_NAME\"/" android/app/build.gradle.kts
 
       - run: flutter pub get
 

@@ -56,50 +56,24 @@ jobs:
 
       - name: Build Release APK
         if: github.event_name == 'workflow_dispatch'
-        run: |
-          flutter build apk \
-            --release \
-            --split-per-abi \
-            --no-tree-shake-icons
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Build Dev APK
         if: github.event_name == 'pull_request'
-        run: |
-          flutter build apk \
-            --release \
-            --split-per-abi \
-            --no-tree-shake-icons \
-            --dart-define=dev=1
+        run: flutter build apk --release --no-tree-shake-icons --dart-define=dev=1
 
-      - name: Rename
-        run: |
-          mkdir -p dist
-          for file in build/app/outputs/flutter-apk/app-*-release.apk; do
-            abi=$(echo "$file" | sed -E 's|.*app-(.*)-release\.apk|\1|')
-            mv "$file" "PiliPlus_TV_${{ env.version }}_${abi}.apk"
-          done
+      - name: Find APKs
+        run: find . -name "*.apk"
 
-      - name: Upload arm64-v8a
+      - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: Android_TV_arm64-v8a
-          path: PiliPlus_TV_*_arm64-v8a.apk
-
-      - name: Upload armeabi-v7a
-        uses: actions/upload-artifact@v7
-        with:
-          name: Android_TV_armeabi-v7a
-          path: PiliPlus_TV_*_armeabi-v7a.apk
-
-      - name: Upload x86_64
-        uses: actions/upload-artifact@v7
-        with:
-          name: Android_TV_x86_64
-          path: PiliPlus_TV_*_x86_64.apk
+          name: Piliplus_TV_APK
+          path: build/app/outputs/flutter-apk/app-*-release.apk
 
       - name: Create Release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag }}
-          files: PiliPlus_TV_*.apk
+          files: build/app/outputs/flutter-apk/app-*-release.apk

@@ -18,7 +18,7 @@ on:
 
 jobs:
   android_tv:
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == '"'"'pull_request'"'"' || github.event_name == '"'"'workflow_dispatch'"'"' }}
     name: Build Android TV
     runs-on: ubuntu-latest
     permissions: write-all
@@ -35,70 +35,36 @@ jobs:
           distribution: "zulu"
           java-version: "17"
           cache: "gradle"
-          cache-dependency-path: |
-            android/*.gradle*
-            android/**/gradle-wrapper.properties
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        id: flutter-action
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
-          cache: true
 
       - name: Apply Patch
-        shell: pwsh
-        run: lib/scripts/patch.ps1 android
-        continue-on-error: true
-
-      - name: Set version
-        if: github.event_name == 'workflow_dispatch'
-        shell: pwsh
-        run: lib/scripts/build.ps1 android
-
-      - name: Flutter Build Release APK
-        if: github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --split-per-abi --dart-define-from-file=pili_release.json --pub
-
-      - name: Flutter Build Dev APK
-        if: github.event_name == 'pull_request'
         run: |
-          flutter build apk --release --split-per-abi --android-project-arg dev=1 --pub
+          git config --global user.name "ci"
+          git config --global user.email "ci@example.com"
+          git reset --hard HEAD
+          git revert 362b1de29974ffc1ed6faa826e1df870d7bec75f --no-edit || true
+          git apply lib/scripts/modal_barrier.patch || true
+          git apply lib/scripts/mouse_cursor.patch || true
+          git apply lib/scripts/bottom_sheet.patch || true
 
-      - name: Rename
-        run: |
-          for file in build/app/outputs/flutter-apk/app-*-release.apk; do
-            abi=$(echo "$file" | sed -E 's|.*app-(.*)-release\.apk|\1|')
-            mv "$file" "PiliPlus_TV_${abi}.apk"
-          done
-        shell: bash
+      - name: Flutter pub get
+        run: flutter pub get
 
-      - name: Upload arm64-v8a
+      - name: Build Release APK
+        if: github.event_name == '"'"'workflow_dispatch'"'"'
+        run: flutter build apk --release --split-per-abi --no-tree-shake-icons
+
+      - name: Build Dev APK
+        if: github.event_name == '"'"'pull_request'"'"'
+        run: flutter build apk --release --split-per-abi --no-tree-shake-icons --dart-define=dev=1
+
+      - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          archive: false
-          name: Android_TV_arm64-v8a
-          path: PiliPlus_TV_*_arm64-v8a.apk
-
-      - name: Upload armeabi-v7a
-        uses: actions/upload-artifact@v7
-        with:
-          archive: false
-          name: Android_TV_armeabi-v7a
-          path: PiliPlus_TV_*_armeabi-v7a.apk
-
-      - name: Upload x86_64
-        uses: actions/upload-artifact@v7
-        with:
-          archive: false
-          name: Android_TV_x86_64
-          path: PiliPlus_TV_*_x86_64.apk
-
-      - name: Release
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.event.inputs.tag }}
-          name: ${{ github.event.inputs.tag }}
-          files: PiliPlus_TV_*.apk
+          name: PiliPlus_TV_APK
+          path: build/app/outputs/flutter-apk/app-*.apk
